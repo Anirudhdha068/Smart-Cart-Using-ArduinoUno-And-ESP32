@@ -8,7 +8,7 @@
 
 // USB Host Shield setup
 USB usb;
-HIDBoot<USB_HID_PROTOCOL_KEYBOARD> keyboard(&usb);
+HIDBoot<USB_HID_PROTOCOL_KEYBOARD> keyboard(&usb); // Keep using HIDBoot
 
 // LCD Setup
 LiquidCrystal_I2C lcd(0x27, 16, 4); // Initialize LCD with I2C address 0x27
@@ -35,6 +35,31 @@ struct Product {
 Product cart[10]; // Array to hold products in the cart
 int cartSize = 0; // Current number of products in the cart
 
+// Forward declaration of processBarcode
+void processBarcode(String barcode);
+
+// Custom report parser for keyboard input
+class MyKeyboardReportParser : public HIDReportParser {
+public:
+    void OnKeyPress(uint8_t mod, uint8_t key) {
+        // Handle key press
+        if (key == 0x28) { // Enter key
+            processBarcode(scannedBarcode); // Process the scanned barcode
+            scannedBarcode = ""; // Clear the scanned barcode
+        } else {
+            scannedBarcode += (char)key; // Append the character to the scanned barcode
+        }
+    }
+
+    // Implement the pure virtual function from HIDReportParser
+    void Parse(USBHID *hid, bool is_rpt_id, uint8_t len, uint8_t *buf) override {
+        // You can leave this empty or implement it if needed
+    }
+};
+
+// Create an instance of the keyboard report parser
+MyKeyboardReportParser keyboardParser;
+
 void setup() {
     Serial.begin(115200); // Start serial communication for debugging
     printerSerial.begin(115200); // Start serial communication with the printer
@@ -52,7 +77,7 @@ void setup() {
         while (1); // Halt if initialization fails
     }
 
-    keyboard.SetReportParser(0, (HIDReportParser*)&keyboard); // Set up keyboard parser
+    keyboard.SetReportParser(0, &keyboardParser); // Set up keyboard parser
 
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));  // Set RTC to compile time
 }
@@ -60,19 +85,13 @@ void setup() {
 void loop() {
     usb.Task(); // Handle USB tasks
 
-    // Check if a key has been pressed
-    if (keyboard.available()) {
-        String barcode = keyboard.readStringUntil('\n'); // Read the barcode
-        processBarcode(barcode); // Process the scanned barcode
-    }
-
     // Check for response from ESP32
     if (espSerial.available()) {
         String response = espSerial.readStringUntil('\n');
         response.trim();
         Serial.println("Received response: " + response);  // Debug print
         processResponse(response);
-        delay(200);  // Add a small delay to avoid rapid loops
+        delay(200); // Add a small delay to avoid rapid loops
     }
 }
 
@@ -112,7 +131,7 @@ void processResponse(String response) {
         lcd.clear();
         lcd.setCursor(0, 0);
         lcd.print(productName); // Display product name on LCD
-        lcd.set Cursor(0, 1);
+        lcd.setCursor(0, 1); // Corrected line
         lcd.print("Price: $" + String(productPrice)); // Display product price
         Serial.println("Added: " + productName);
     }
