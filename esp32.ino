@@ -5,7 +5,7 @@
 #include <ArduinoJson.h>
 
 // WiFi credentials
-const char* ssid = "OPPO"; // Your WiFi SSID
+const char* ssid = "xyz"; // Your WiFi SSID
 const char* password = "1234567890"; // Your WiFi password
 
 // Google Sheets API credentials
@@ -18,7 +18,7 @@ JsonArray rows;
 
 void setup() {
   // Start the Serial communication for debugging
-  Serial.begin(115200); // Set baud rate to 115200 for faster communication
+  Serial.begin(115200);      // Set baud rate to 115200 for faster communication
 
   // Connect to WiFi
   WiFi.begin(ssid, password); // Start WiFi connection
