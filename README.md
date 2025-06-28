@@ -1,4 +1,4 @@
-# Smart-Cart Created By Anirudhdha Poriya
+# Smart Cart Using Arduino Uno And ESP32
 <br>
 
 
