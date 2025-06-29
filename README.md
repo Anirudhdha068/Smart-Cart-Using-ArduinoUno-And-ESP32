@@ -12,11 +12,11 @@ USB Barcode Scanner <br>
 USB Host Shilde <br>
 <br>
 <br>
-<h3>Hardware Connections  🛠️ </h3>
+<h3> Hardware Connections  🛠️ </h3>
 
 | Module / Part | Signal | Arduino UNO Pin(s) | Notes / Tips |
 |---------------|--------|-------------------|--------------|
-| **LCD 16×4 (I2C backpack)** | SDA | **A4** | I2C bus (pull-ups already on backpack) |
+| **LCD 16×4 (I2C backpack)** | SDA | A4 | I2C bus (pull-ups already on backpack) |
 | | SCL | **A5** |  ― |
 | | VCC | 5 V | From UNO (≈20 mA) |
 | | GND | GND |  ― |
@@ -26,7 +26,7 @@ USB Host Shilde <br>
 | | RX (printer ⬅ Arduino) | **D3** (SoftwareSerial TX) |  ― |
 | | VCC | **External 5 V / 2 A** | Printer peaks at 1.5 A when heating |
 | | GND | Common GND | Tie supply ground to UNO ground |
-| **RTC DS3231** | SDA | **A4** | Shares I²C bus with LCD |
+| **RTC DS3231** | SDA | **A4** | Shares I2C bus with LCD |
 | | SCL | **A5** |  ― |
 | | VCC | 5 V | CR2032 keeps time offline |
 | | GND | GND |  ― |
@@ -42,7 +42,7 @@ USB Host Shilde <br>
 - Tie **all grounds together** to avoid weird resets.  
 - If the LCD backlight flickers when the printer fires, add a 470 µF capacitor across the printer’s 5 V & GND.
 
-### I²C Address Reference
+### I2C Address Reference
 | Device | Default Addr |
 |--------|--------------|
 | LCD backpack | `0x27` or `0x3F` |
