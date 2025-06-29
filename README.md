@@ -12,40 +12,69 @@ USB Barcode Scanner <br>
 USB Host Shilde <br>
 <br>
 <br>
-<h3> Hardware Connections  🛠️ </h3>
+## 🔌 Hardware Connections (Arduino UNO + ESP32 Smart Cart)
 
-| Module / Part | Signal | Arduino UNO Pin(s) | Notes / Tips |
-|---------------|--------|-------------------|--------------|
-| **LCD 16×4 (I2C backpack)** | SDA | A4 | I2C bus (pull-ups already on backpack) |
-| | SCL | **A5** |  ― |
-| | VCC | 5 V | From UNO (≈20 mA) |
-| | GND | GND |  ― |
-| **USB Host Shield** | — | SPI pins **D10-D13** (plus 5 V & GND) | Sits on top of UNO; provides USB-A port |
-| **Barcode Scanner (USB)** | USB-A plug | USB Host Shield port | Powered from shield; no extra wiring |
-| **Thermal Printer (CSN-A1X, TTL-serial)** | TX (printer ➜ Arduino) | **D2** (SoftwareSerial RX) | Level-compatible at 5 V |
-| | RX (printer ⬅ Arduino) | **D3** (SoftwareSerial TX) |  ― |
-| | VCC | **External 5 V / 2 A** | Printer peaks at 1.5 A when heating |
-| | GND | Common GND | Tie supply ground to UNO ground |
-| **RTC DS3231** | SDA | **A4** | Shares I2C bus with LCD |
-| | SCL | **A5** |  ― |
-| | VCC | 5 V | CR2032 keeps time offline |
-| | GND | GND |  ― |
-| **Buzzer / Status LED** (optional) | + | **D6** (PWM) | Audible/visual feedback |
-| | – | GND |  ― |
-| **Wi-Fi Module (ESP-01 / ESP8266)** *(for cloud logging)* | TX | **D8** (SoftwareSerial RX) | 3 V-only; use level shifter |
-| | RX | **D7** (SoftwareSerial TX) |  ― |
-| | VCC | 3.3 V (≦300 mA) | Separate 3 V reg recommended |
-| | GND | Common GND |  ― |
+### 🧠 Arduino UNO Connections
 
-### Power Guidelines
-- **Printer** needs a dedicated 5 V ≥ 2 A source.  
-- Tie **all grounds together** to avoid weird resets.  
-- If the LCD backlight flickers when the printer fires, add a 470 µF capacitor across the printer’s 5 V & GND.
+| Component / Module           | Signal           | Arduino UNO Pin | Notes |
+|-----------------------------|------------------|------------------|-------|
+| **I2C LCD (16x4)**          | SDA              | A4               | I2C |
+|                             | SCL              | A5               |  ―   |
+|                             | VCC              | 5V               |  ―   |
+|                             | GND              | GND              |  ―   |
+| **USB Host Shield**         | SPI              | D10–D13          | Mounts on UNO |
+|                             | 5V, GND          | 5V, GND          | Required for barcode scanner |
+| **Barcode Scanner**         | USB Plug         | USB Host Shield  | Plug directly |
+| **Thermal Printer (TTL)**   | TX (Printer ➜ Uno)| D5 (Software RX) | Uses SoftwareSerial |
+|                             | RX (Uno ➜ Printer)| D6 (Software TX) | Baud: 19200 |
+|                             | VCC              | External 5V (2A) | Do **not** use Arduino 5V |
+|                             | GND              | GND              | Common GND with Arduino |
+| **RTC Module (DS3231)**     | SDA              | A4               | I2C shared with LCD |
+|                             | SCL              | A5               |  ―   |
+|                             | VCC              | 5V               |  ―   |
+|                             | GND              | GND              |  ―   |
+| **ESP32 (for cloud link)**  | TX (ESP32)       | D7 (Uno RX)      | Use voltage divider (5V ➜ 3.3V) |
+|                             | RX (ESP32)       | D8 (Uno TX)      | Use level shifter |
+|                             | GND              | GND              | Must share GND |
+|                             | VCC              | External 3.3V    | Use separate LDO regulator if needed |
 
-### I2C Address Reference
-| Device | Default Addr |
-|--------|--------------|
-| LCD backpack | `0x27` or `0x3F` |
-| DS3231 RTC | `0x68` |
+---
 
+### 📶 ESP32 Connections
+
+| Component       | Signal | ESP32 Pin | Notes |
+|----------------|--------|-----------|-------|
+| **Serial Comm to Arduino UNO** | TX | GPIO17 (or any free TX) | Send product data |
+|                             | RX | GPIO16 (or any free RX) | Receive barcode |
+|                             | GND | GND       | Common GND |
+|                             | VCC | 3.3V      | Supply from USB or LDO |
+
+> **Note**: Update `Serial.begin()` or `Serial1.begin()` in your ESP32 code based on pins used.
+
+---
+
+### ⚠️ Power Supply Notes
+
+- **Thermal Printer**: Needs **5V 2A** supply (use adapter or Li-ion + boost converter).
+- Do **not power printer from Arduino UNO's 5V pin** — it can't supply enough current.
+- ESP32 needs **3.3V**, not 5V! Always use a **level shifter** or resistor divider on `RX` line.
+- Make sure all **GNDs are connected together** (UNO, printer, ESP32, external supplies).
+
+---
+
+### 🧾 Optional Enhancements
+
+- **Checkout barcode** value (`3366`) triggers bill print.
+- Use **Google Sheets** via ESP32 to fetch product details using barcode.
+- Connect **status LED or buzzer** to UNO D9/D10 if needed for feedback.
+
+---
+
+### 🔁 Communication Summary
+
+- **Barcode scanner** ➜ Arduino UNO via USB Host Shield  
+- **UNO sends barcode to ESP32** via Serial (D7-D8)  
+- **ESP32 searches barcode in Google Sheets**  
+- **ESP32 sends product name + price back to UNO**, which updates LCD & cart  
+- **At checkout (3366)** ➜ Thermal printer prints invoice
 
