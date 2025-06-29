@@ -12,11 +12,11 @@ USB Barcode Scanner <br>
 USB Host Shilde <br>
 <br>
 <br>
-## Hardware Connections  🛠️
+### Hardware Connections  🛠️
 
 | Module / Part | Signal | Arduino UNO Pin(s) | Notes / Tips |
 |---------------|--------|-------------------|--------------|
-| **LCD 16×4 (I2C backpack)** | SDA | **A4** | I²C bus (pull-ups already on backpack) |
+| **LCD 16×4 (I2C backpack)** | SDA | **A4** | I2C bus (pull-ups already on backpack) |
 | | SCL | **A5** |  ― |
 | | VCC | 5 V | From UNO (≈20 mA) |
 | | GND | GND |  ― |
@@ -48,8 +48,4 @@ USB Host Shilde <br>
 | LCD backpack | `0x27` or `0x3F` |
 | DS3231 RTC | `0x68` |
 
-```cpp
-// Example SoftwareSerial mappings (grabs printer + Wi-Fi on the fly)
-#include <SoftwareSerial.h>
-SoftwareSerial Printer (2, 3);   // RX, TX  ➜ Thermal printer
-SoftwareSerial WiFi    (8, 7);   // RX, TX  ➜ ESP-01
+
