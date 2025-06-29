@@ -12,7 +12,7 @@ USB Barcode Scanner <br>
 USB Host Shilde <br>
 <br>
 <br>
-### Hardware Connections  🛠️
+<h3>Hardware Connections  🛠️ </h3>
 
 | Module / Part | Signal | Arduino UNO Pin(s) | Notes / Tips |
 |---------------|--------|-------------------|--------------|
